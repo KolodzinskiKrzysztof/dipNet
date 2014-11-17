@@ -1,6 +1,0 @@
-import argparse
-
-parser = argparse.ArgumentParser(description = 'give me dataset')
-parser.add_argument('dataset', metavar='D', nargs=1, help='file with training examples')
-
-args = parser.parse_args()
