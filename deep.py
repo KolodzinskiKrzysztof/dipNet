@@ -3,7 +3,9 @@ import data_preparer
 import theano
 import classifier
 import os
-
+import loss_function
+import training_function
+import numpy
 
 #parser = argparse.ArgumentParser(description = 'give me dataset')
 #parser.add_argument('dataset', metavar='D', nargs=1, help='file with training examples')
@@ -14,21 +16,16 @@ training_set, validation_set, test_set = data_preparer.DataPreparer('./mnist.pkl
 #dataset - training, valid, test
 
 #computed_classification - 2d matrix - row per example, column pre class
-def negative_log_likehood(computed_classifications, correct_labels):
-    theano.tensor.log(computed_classifications)
-    computed_classifications[theano.tensor.arange(correct_labels.shape[0]), correct_labels]
-    theano.tensor.log(computed_classifications)[theano.tensor.arange(correct_labels.shape[0]), correct_labels]
-    return -theano.tensor.mean(theano.tensor.log(computed_classifications)[theano.tensor.arange(correct_labels.shape[0]), correct_labels])
 
 def binary_errors(computed_labels, correct_labels):
-    theano.tensor.mean(theano.tensor.neq(computed_labels, correct_labels))
+    return theano.tensor.mean(theano.tensor.neq(computed_labels, correct_labels))
 
 x = theano.tensor.matrix('x')
 y = theano.tensor.ivector('y')
 
-classifier = classifier.Classifier(theano.tensor.nnet.softmax, negative_log_likehood, x, 28*28, 10)
+classifier = classifier.Classifier(theano.tensor.nnet.softmax,  x, 28*28, 10)
 
-cost = negative_log_likehood(classifier.computed_labels, y)
+cost = loss_function.negative_log_likehood(classifier.computed_labels, y)
 
 
 W_gradient = theano.tensor.grad(cost = cost, wrt=classifier.W)
@@ -42,20 +39,40 @@ updates = [(classifier.W, classifier.W - learning_rate * W_gradient),
 index = theano.tensor.iscalar()
 batch_size=600
 n_train_batches = training_set[0].get_value(borrow=True).shape[0]/batch_size
+n_test_batches = test_set[0].get_value(borrow=True).shape[0]/batch_size
+n_validation_batches = validation_set[0].get_value(borrow=True).shape[0]/batch_size
 
-train_model = theano.function(
-        inputs=[index],
-        outputs=cost,
-        updates=updates,
-        givens={
-            x: training_set[0][index * batch_size: (index + 1) * batch_size],
-            y: training_set[1][index * batch_size: (index + 1) * batch_size]
-        }
-    )
+error = binary_errors(classifier.output_labels, y)
 
-for minibatch_index in xrange(n_train_batches):
-     avgcost = train_model(minibatch_index)
+train_model = training_function.training(index, cost, updates, training_set, batch_size,x,y, updates)
+validate = training_function.test(index, error, validation_set, batch_size,x,y)
+test = training_function.test(index, error, test_set, batch_size,x,y)
 
+n_epochs = 1000
+validation_freq = 2000
+max_not_learning_trainings = 500
+
+best_validation_error = numpy.inf
+break_loop = False
+
+for epoch in xrange(n_epochs):
+    for minibatch_index in xrange(n_train_batches):
+        iteration = epoch*n_train_batches + minibatch_index
+        minibatch_cost = train_model(minibatch_index)
+        if (iteration % validation_freq ==0):
+            validation_losses  = [validate(i) for i in xrange(n_validation_batches)]
+            current_validation_error = numpy.mean(validation_losses)
+            if (current_validation_error < best_validation_error):
+                best_validation_error = current_validation_error
+                not_learning_trainings = 0
+                test_losses = [test(i) for i in xrange(n_test_batches)]
+            else:
+                not_learning_trainings += 1
+        if (not_learning_trainings >= max_not_learning_trainings):
+            break_loop = True
+            break
+    if (break_loop):
+        break
 
 
 
