@@ -50,7 +50,7 @@ test = training_function.test(index, error, test_set, batch_size,x,y)
 
 n_epochs = 1000
 validation_freq = 2000
-max_not_learning_trainings = 500
+max_not_learning_trainings = 5
 
 best_validation_error = numpy.inf
 break_loop = False
@@ -58,14 +58,17 @@ break_loop = False
 for epoch in xrange(n_epochs):
     for minibatch_index in xrange(n_train_batches):
         iteration = epoch*n_train_batches + minibatch_index
+        print "iteration " + str(iteration)
         minibatch_cost = train_model(minibatch_index)
         if (iteration % validation_freq ==0):
             validation_losses  = [validate(i) for i in xrange(n_validation_batches)]
             current_validation_error = numpy.mean(validation_losses)
+            print "current validation error" + str (current_validation_error)
             if (current_validation_error < best_validation_error):
                 best_validation_error = current_validation_error
                 not_learning_trainings = 0
                 test_losses = [test(i) for i in xrange(n_test_batches)]
+                print "test loses" + str(numpy.mean(test_losses))
             else:
                 not_learning_trainings += 1
         if (not_learning_trainings >= max_not_learning_trainings):
