@@ -6,6 +6,7 @@ import os
 import loss_function
 import training_function
 import numpy
+import error
 
 #parser = argparse.ArgumentParser(description = 'give me dataset')
 #parser.add_argument('dataset', metavar='D', nargs=1, help='file with training examples')
@@ -17,8 +18,8 @@ training_set, validation_set, test_set = data_preparer.DataPreparer('./mnist.pkl
 
 #computed_classification - 2d matrix - row per example, column pre class
 
-def binary_errors(computed_labels, correct_labels):
-    return theano.tensor.mean(theano.tensor.neq(computed_labels, correct_labels))
+#def binary_errors(computed_labels, correct_labels):
+#    return theano.tensor.mean(theano.tensor.neq(computed_labels, correct_labels))
 
 x = theano.tensor.matrix('x')
 y = theano.tensor.ivector('y')
