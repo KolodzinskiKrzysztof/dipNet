@@ -1,0 +1,26 @@
+Zastosowanie głębokich sieci neuronowych do obrazu
+
+
+Przedmowa
+
+W niniejszej pracy (dalej nazywana po prostu pracą) zakłada się, że czytelnik zaznajomiony jest z podstawowymi pojęciami dotyczącymi sieci neuronowych (dalej często nazywanych po prostu sieciami) - neuron, warstwa ukryta, funkcja aktywacji, propagacja wsteczna itp. W pracy zostanie przedstawione działanie zaawansowanych sieci głębokich na przykładzie sieci 'deep belief network'. W związku z brakiem polskiego nazewnictwa w pracy, poza wstępem, będzie używana nazwa 'sieć głęboka'. We wstępie, aby zapobiec nieścisłościom typ sieci będzie podawany jawnie.
+Integralną częścią pracy jest aplikacja DipNet będąca środowiskiem do tworzenia, uczenia oraz testowania sieci. Aplikacja ta dostępna jest w repozytorium git pod adresem https://github.com/KolodzinskiKrzysztof/dipNet
+
+Wstęp
+
+Głębokie sieci neuronowe
+
+Jak podaje Wikipedia, głęboka sieć neuronowa to taka, w której skład wchodzi wiele warstw ukrytych. Do definicji tej pasują m. in. :popularne w dziedzinie obrazów konwolucujne głębokie sieci neuronowe (convolutional deep neural networks - 1989r.), sieci długiej pamięci krótkotrwałej [1 - tłumaczenie własne] (Long short term memory - 1997r.) oraz wspomniane wcześniej i będące głównym tematem pracy sieci typu 'deep belief network'.
+
+Problemy z sieciami głębokimi
+
+Istnieje wiele powodów, przez które głębokie sieci neuronowe nie były wykorzystywane. Do niedawna głównym powodem był kosz obliczeń - głębokie sieci neuronowe potrzebują dużej mocy obliczeniowej, aby działać sprawnie. Dziś wydajność sprzętowa jednostek obliczeniowych jest nieporównywalnie większa i o wiele łatwiej stosować takie sieci.
+Drugim, najczęstszym powodem jest trudność uczenia i skłonność do przeuczenia (overfitting) - propagacja wsteczna i metoda gradientu nie są odpowiednimi narzędziami do uczenia wielowarstwowych sieci. Przy sieciach głębokich metody te mają tendencje do zatrzymywania się w minimach lokalnych, a propagacja błędu z kolejną warstwą w tył jest coraz mniejsza co pozwala sprawnie uczyć tylko końcowe warstwy, zawodząc przy początkowych.
+
+Deep belief networks
+
+Sieci będące głównym tematem tej pracy są złożeniem kilku typów różnych sieci. Głównym jej elementem są warstwy ograniczonej maszyny Boltzmana.
+
+Ograniczona maszyna Boltzmana (restricted Boltzman machine):
+
+Ograniczona maszyna Boltzmana jest siecią neuronową złożoną z dwóch grup neuronów - widocznych i ukrytych. 
